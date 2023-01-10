@@ -15,12 +15,12 @@ terraform {
   }
   required_version = ">= 1.1.2"
 
-  backend "azurerm" {
-    storage_account_name = "cdcterraformstates"
-    container_name       = "aks-weu"
-    resource_group_name  = "CDC-TERRAFORM"
-    key                  = "prometheus-stacks/terraform.tfstate"
-  }
+  # backend "azurerm" {
+  #   storage_account_name = "cdcterraformstates"
+  #   container_name       = "aks-weu"
+  #   resource_group_name  = "CDC-TERRAFORM"
+  #   key                  = "prometheus-stacks/terraform.tfstate"
+  # }
 }
 
 provider "azurerm" {
@@ -30,19 +30,30 @@ provider "azurerm" {
   environment     = "public"
 }
 
-data "terraform_remote_state" "aks-cluster" {
-  backend = "azurerm"
+# data "terraform_remote_state" "aks-cluster" {
+#   backend = "azurerm"
+#   config = {
+#     storage_account_name = "cdcterraformstates"
+#     container_name       = "aks-weu"
+#     resource_group_name  = "CDC-TERRAFORM"
+#     key                  = "clusters/terraform.tfstateenv:${var.environment}-${var.zone}"
+#   }
+# }
+
+data "terraform_remote_state" "aks_cluster" {
+  backend = "remote"
+
   config = {
-    storage_account_name = "cdcterraformstates"
-    container_name       = "aks-weu"
-    resource_group_name  = "CDC-TERRAFORM"
-    key                  = "clusters/terraform.tfstateenv:${var.environment}-${var.zone}"
+    organization = "demo-tf-kojak"
+    workspaces = {
+      name = "dior-azure-cluster-nonprd-dmz"
+    }
   }
 }
 
 locals {
-  kube_config           = length(data.terraform_remote_state.aks-cluster.outputs.kubernetes_cluster.kube_admin_config) > 0 ? data.terraform_remote_state.aks-cluster.outputs.kubernetes_cluster.kube_admin_config.0 : data.terraform_remote_state.aks-cluster.outputs.kubernetes_cluster.kube_config.0
-  ressource_groupe_name = data.terraform_remote_state.aks-cluster.outputs.ressource_group_name
+  kube_config           = length(data.terraform_remote_state.aks_cluster.outputs.kubernetes_cluster.kube_admin_config) > 0 ? data.terraform_remote_state.aks_cluster.outputs.kubernetes_cluster.kube_admin_config.0 : data.terraform_remote_state.aks_cluster.outputs.kubernetes_cluster.kube_config.0
+  ressource_groupe_name = data.terraform_remote_state.aks_cluster.outputs.ressource_group_name
 }
 
 provider "kubernetes" {
