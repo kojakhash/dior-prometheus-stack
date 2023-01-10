@@ -56,10 +56,10 @@ resource "helm_release" "prometheus-stack" {
     value = random_string.grafana-adminPassword.result
   }
 
-  set {
-    name  = "alertmanager.config.global.slack_api_url"
-    value = module.vault.secrets["slack-hook-url"].value
-  }
+  # set {
+  #   name  = "alertmanager.config.global.slack_api_url"
+  #   value = module.vault.secrets["slack-hook-url"].value
+  # }
 
   # set {
   #   name  = "alertmanager.config.global.opsgenie_api_url"

@@ -43,3 +43,6 @@ variable "interne_ingress" {
   type    = bool
   default = false
 }
+variable "tenant_id" {
+  type = string
+}
