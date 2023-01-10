@@ -48,7 +48,7 @@ resource "helm_release" "prometheus-stack" {
 
   values = [
     templatefile("${path.module}/helm_values/common.yaml.tpl", {}),
-    templatefile("${path.module}/helm_values/${var.environment}-${var.zone}.yaml.tpl")
+    templatefile("${path.module}/helm_values/${var.environment}-${var.zone}.yaml.tpl", {})
   ]
 
   set {
